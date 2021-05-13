@@ -43,6 +43,7 @@ function HomePage(props) {
 
   const [redirect, setRedirect] = useState(false);
   const [chatRoomName, setChatRoomName] = useState({});
+  // eslint-disable-next-line
   const [myEvt, setMyEvt] = useState({});
   const handleSubmit = async (evt) => {};
   if (redirect) {

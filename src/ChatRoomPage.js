@@ -82,6 +82,7 @@ function ChatRoomPage(props) {
   const [viewThreadId, setViewThreadId] = useState(null);
   const [initialized, setInitialized] = useState(false);
   const [messages, setMessages] = useState([]);
+  // eslint-disable-next-line
   const [rooms, setRooms] = useState([]);
 
   const handleSubmit = async (evt) => {
@@ -134,6 +135,7 @@ function ChatRoomPage(props) {
   const [distinct, setDistinct] = useState([]);
 
   useEffect(() => {
+    // eslint-disable-next-line
     for (const [key, { room, user }] of Object.entries(onlineUsers)) {
       if (distinct.indexOf(user) < 0) {
         setDistinct((prev) => {
@@ -144,6 +146,7 @@ function ChatRoomPage(props) {
   }, [onlineUsers, distinct]);
 
   const isUserOnline = (u) => {
+    // eslint-disable-next-line
     for (const [key, { room, user }] of Object.entries(onlineUsers)) {
       if (user === u && room === props.location.state.chatRoomName) {
         return true;
@@ -158,10 +161,12 @@ function ChatRoomPage(props) {
     console.log(response.data);
     setMessages(response.data);
     const dis = [];
+    // eslint-disable-next-line
     response.data.map((m) => {
       if (dis.indexOf(m.author) === -1) {
         dis.push(m.author);
       }
+      // array-callback-return
     });
     setDistinct(dis);
 
@@ -186,6 +191,7 @@ function ChatRoomPage(props) {
       connectToRoom();
       getRooms();
     }
+    // eslint-disable-next-line
   }, []);
 
   const [show, setShow] = useState(null);
@@ -214,6 +220,7 @@ function ChatRoomPage(props) {
     let num = 0;
     messages
       .filter((thread) => thread.threadId === id)
+      // eslint-disable-next-line
       .map((m, i) => {
         num++;
       });
@@ -451,7 +458,7 @@ function ChatRoomPage(props) {
                             }}
                           />
                           +
-                          {showReactionBox && currentMsgId == m.id ? (
+                          {showReactionBox && currentMsgId === m.id ? (
                             <div className="reaction-box">
                               <button
                                 onClick={() => {
@@ -637,6 +644,7 @@ function ChatRoomPage(props) {
 }
 export default ChatRoomPage;
 
+// eslint-disable-next-line
 const StyledSideBar = styled(Drawer)`
   background: var(--dark-color-b);
   color: #fff;
