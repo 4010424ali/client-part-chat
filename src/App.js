@@ -8,6 +8,7 @@ import ChatRoomPage from './ChatRoomPage';
 const history = createHistory();
 
 function App() {
+  console.log('Working');
   return (
     <div className="App">
       <Router history={history}>
