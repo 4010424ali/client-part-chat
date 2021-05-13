@@ -236,7 +236,7 @@ function ChatRoomPage(props) {
       }
     });
     console.log(i);
-    const APIURL = 'http://localhost:3000';
+    const APIURL = 'https://stark-mesa-34467.herokuapp.com';
     const update = (obj) => {
       fetch(`${APIURL}/chatroom/chatroom/messages/reaction`, {
         method: 'POST', // or 'PUT'
