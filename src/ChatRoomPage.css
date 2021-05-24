@@ -291,7 +291,7 @@ a {
   margin-top: 40px;
   padding-bottom: 20px;
   position: absolute;
-  right: 30%;
+  right: 2%;
 }
 .counter-ct {
   margin-right: 8px;
@@ -302,9 +302,8 @@ a {
   transform: scale(1.2);
 }
 .reaction-box {
-  background-color: #2a698d;
-  padding: 10px;
   margin-left: 10px;
+  margin-top: -10px;
 }
 
 .online-user {
