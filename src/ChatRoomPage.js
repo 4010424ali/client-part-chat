@@ -85,18 +85,18 @@ function ChatRoomPage(props) {
   // eslint-disable-next-line
   const [rooms, setRooms] = useState([]);
 
-  const handleSubmit = async (evt) => {
+  const handleSubmit = async (evt, { resetForm }) => {
     const isValid = await schema.validate(evt);
     if (!isValid) {
-      return;
+        return;
     }
     const data = Object.assign({}, evt);
     data.chatRoomName = props.location.state.chatRoomName;
     data.author = props.location.state.handle;
     data.message = evt.message;
     socket.emit('message', data);
-    evt.target.reset();
-  };
+    resetForm();
+};
 
   const handleThreadSubmit = async (evt) => {
     const isValid = await schema.validate(evt);
@@ -277,42 +277,42 @@ function ChatRoomPage(props) {
     let allEmojis = ['like', 'heart', 'blush', 'smile', 'clap'];
     let list = [];
     for (let i = 0; i < 5; i++) {
-      if (obj[allEmojis[i]]) {
-        if (i === 0) {
-          list.push({
-            e: '👍',
-            num: obj[allEmojis[i]],
-          });
-        }
+        if (obj[allEmojis[i]]) {
+            if (i === 0) {
+                list.push({
+                    e: '👍',
+                    num: obj[allEmojis[i]]
+                });
+            }
 
-        if (i === 1) {
-          list.push({
-            e: '💖',
-            num: obj[allEmojis[i]],
-          });
-        }
+            if (i === 1) {
+                list.push({
+                    e: '👎',
+                    num: obj[allEmojis[i]]
+                });
+            }
 
-        if (i === 2) {
-          list.push({
-            e: '😍',
-            num: obj[allEmojis[i]],
-          });
-        }
+            if (i === 2) {
+                list.push({
+                    e: '😍',
+                    num: obj[allEmojis[i]]
+                });
+            }
 
-        if (i === 3) {
-          list.push({
-            e: '🤣',
-            num: obj[allEmojis[i]],
-          });
-        }
+            if (i === 3) {
+                list.push({
+                    e: '🤣',
+                    num: obj[allEmojis[i]]
+                });
+            }
 
-        if (i === 4) {
-          list.push({
-            e: '👏',
-            num: obj[allEmojis[i]],
-          });
+            if (i === 4) {
+                list.push({
+                    e: '👏',
+                    num: obj[allEmojis[i]]
+                });
+            }
         }
-      }
     }
 
     return list;
@@ -348,7 +348,7 @@ function ChatRoomPage(props) {
                 <i class="fas fa-comments"></i> Chair:
               </h3>
               <ListItem>
-                <HuddleName id="room-name">Lawrie Phipps</HuddleName>
+                <HuddleName id="room-name">James Hodgkinson</HuddleName>
               </ListItem>
             </List>
             <Divider />
@@ -408,49 +408,51 @@ function ChatRoomPage(props) {
                         minHeight: '120px',
                       }}
                     >
-                      <div className="row" style={{ position: 'relative' }}>
-                        <div className="author">{m.author}</div>
-                        <div className="date">{m.createdAt}</div>
+                     <MessageHeader>
+                                                <div className= "message-head">
+                                                    <div className='author'>{m.author}</div>
+                                                    <div className='date'>{m.createdAt}</div>
+                                                </div>
 
-                        {props.location.state.handle === m.author ? (
-                          <DeleteButton
-                            onClick={async () => {
-                              deleteMsg(
-                                props.location.state.chatRoomName,
-                                m.id
-                              );
-                              setTimeout(() => {
-                                getMessages();
-                              }, 1000);
-                            }}
-                          >
-                            Delete
-                          </DeleteButton>
-                        ) : null}
-                        <ViewThread
-                          onClick={() => {
-                            setViewThreadId(m.id);
-                            setShowReply(!showReply);
-                            setShow(showReply ? null : m.id);
-                          }}
-                        >
-                          Reply to message
-                        </ViewThread>
-                      </div>
-                      <div className="row" style={{ position: 'relative' }}>
-                        <div className="message-text">{m.message}</div>
-                        <div className="react-ct">
-                          <div className="counter-ct">
-                            {m.reactions
-                              ? m.reactions[0] === '{'
-                                ? getEmojiFromNmae(JSON.parse(m.reactions)).map(
-                                    ({ e, num }) => {
-                                      return <div>{`${e} ${num}`}</div>;
-                                    }
-                                  )
-                                : ''
-                              : ''}
-                          </div>
+                                                <ButtonWrapper>
+                                                    {props.location.state.handle === m.author ? (
+                                                        <DeleteButton
+                                                            onClick={async () => {
+                                                                deleteMsg(props.location.state.chatRoomName, m.id);
+                                                                setTimeout(() => {
+                                                                    getMessages();
+                                                                }, 1000);
+                                                            }}
+                                                        >
+                                                            Delete
+                                                        </DeleteButton>
+                                                    ) : null}
+                                                    <ViewThread
+                                                        onClick={() => {
+                                                            setViewThreadId(m.id);
+                                                            setShowReply(!showReply);
+                                                            setShow(showReply ? null : m.id);
+                                                        }}
+                                                    >
+                                                        Reply to message
+                                                    </ViewThread>
+                                                </ButtonWrapper>
+                                            </MessageHeader>
+
+                                            <div className='row' style={{ position: 'relative' }}>
+                                                <div className='message-text'>{m.message}</div>
+                                                <div className='react-ct'>
+                                                    <div className='counter-ct'>
+                                                        {m.reactions
+                                                            ? m.reactions[0] === '{'
+                                                                ? getEmojiFromNmae(JSON.parse(m.reactions)).map(
+                                                                      ({ e, num }) => {
+                                                                          return <div>{`${e} ${num}`}</div>;
+                                                                      }
+                                                                  )
+                                                                : ''
+                                                            : ''}
+                                                    </div>
                           <EmojiEmotionsIcon
                             onClick={() => {
                               setShowReactionBox(!showReactionBox);
@@ -473,7 +475,7 @@ function ChatRoomPage(props) {
                                   emjoiReact(m.id, 'heart');
                                 }}
                               >
-                                💖
+                                👎
                               </button>
                               <button
                                 onClick={() => {
@@ -609,6 +611,7 @@ function ChatRoomPage(props) {
                   }}
                 />
                 {showEmojis && (
+                  <PickerWrapper>
                   <StyledPicker
                     onEmojiClick={(e, obj) => {
                       setFieldValue(
@@ -619,6 +622,7 @@ function ChatRoomPage(props) {
                       );
                     }}
                   ></StyledPicker>
+                  </PickerWrapper>
                 )}
 
                 <Button
@@ -676,19 +680,14 @@ const StyledInput = styled(TextField)`
 `;
 
 const ViewThread = styled(Button)`
-  background-color: #fa5e02;
-  color: #fff;
-  position: absolute;
-  top: 10px;
-  right: 20px;
+   background-color: #fa5e02;
+    color: #fff;
 `;
 
 const DeleteButton = styled(Button)`
-  background-color: #fa5e02;
-  color: #fff;
-  position: absolute;
-  top: 60px;
-  right: 20px;
+   background-color: #fa5e02;
+    color: #fff;
+    margin-right: 20px;
 `;
 const StyledPicker = styled(Picker)`
   right: 20px;
@@ -696,7 +695,23 @@ const StyledPicker = styled(Picker)`
 `;
 
 const StyledEmojiReact = styled(EmojiEmotionsIcon)`
-  fill: #166797;
-  margin-top: 18px;
-  cursor: pointer;
+    fill: #166797;
+    margin-top: 18px;
+    cursor: pointer;
+    float: right;
+    margin-right: 80px;
+`;
+
+const PickerWrapper = styled.div`
+    right: 20px;
+    position: absolute;
+    bottom: calc(100% - -10px);
+`;
+
+const ButtonWrapper = styled.div`
+`;
+
+const MessageHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
 `;

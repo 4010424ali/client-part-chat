@@ -234,7 +234,7 @@ a {
 }
 
 .author {
-  padding-left: 30px;
+  padding-left: 15px;
   font-size: medium;
   color: #4d5050;
   font-weight: bolder;
@@ -273,6 +273,8 @@ a {
   border-radius: 119px;
   height: 64px;
   width: 80%;
+  margin-bottom: 35px;
+
 }
 .reaction-box button {
   border: none;
@@ -310,4 +312,7 @@ a {
   height: 10px;
   border-radius: 50%;
   background-color: green;
+}
+.message-head {
+  display: flex;
 }
