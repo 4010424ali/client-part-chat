@@ -5,9 +5,12 @@
 
 .chat-messages {
   padding: 30px;
-  max-height: 500px;
+  max-height: 65vh;
   overflow-y: scroll;
 }
+
+
+
 
 .chat-messages .message {
   padding: 10px;
@@ -126,7 +129,7 @@ a {
 
 .chat-messages {
   padding: 30px;
-  max-height: 500px;
+  max-height: 68vh;
   overflow-y: scroll;
   width: 100%;
 }

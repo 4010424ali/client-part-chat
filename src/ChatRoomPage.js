@@ -10,6 +10,8 @@ import TextField from '@material-ui/core/TextField';
 import KeyboardArrowRightRoundedIcon from '@material-ui/icons/KeyboardArrowRightRounded';
 // import { Picker } from "emoji-mart";
 import Picker from 'emoji-picker-react';
+import Moment from 'react-moment';
+
 
 import { JiscBoombox } from 'jisc-innovation-mui-components';
 
@@ -77,6 +79,8 @@ const schema = yup.object({
 });
 
 function ChatRoomPage(props) {
+  console.log("ChatRoomPage.js");
+
   const classes = useStyles();
 
   const [viewThreadId, setViewThreadId] = useState(null);
@@ -84,19 +88,18 @@ function ChatRoomPage(props) {
   const [messages, setMessages] = useState([]);
   // eslint-disable-next-line
   const [rooms, setRooms] = useState([]);
-
   const handleSubmit = async (evt, { resetForm }) => {
     const isValid = await schema.validate(evt);
     if (!isValid) {
-        return;
+      return;
     }
     const data = Object.assign({}, evt);
-    data.chatRoomName = props.location.state.chatRoomName;
-    data.author = props.location.state.handle;
+    data.chatRoomName = props.roomState.chatRoomName;
+    data.author = props.roomState.handle;
     data.message = evt.message;
     socket.emit('message', data);
     resetForm();
-};
+  };
 
   const handleThreadSubmit = async (evt) => {
     const isValid = await schema.validate(evt);
@@ -104,9 +107,9 @@ function ChatRoomPage(props) {
       return;
     }
     const data = Object.assign({}, evt);
-    data.chatRoomName = props.location.state.chatRoomName;
+    data.chatRoomName = props.roomState.chatRoomName;
     data.threadId = viewThreadId;
-    data.author = props.location.state.handle;
+    data.author = props.roomState.handle;
     data.message = evt.message;
     socket.emit('message', data);
     evt.target.reset();
@@ -115,24 +118,25 @@ function ChatRoomPage(props) {
   const [onlineUsers, setOnlineUsers] = useState({});
   const connectToRoom = () => {
     socket.on('connect', (data) => {
-      socket.emit('join', props.location.state.chatRoomName);
+      socket.emit('join', props.roomState.chatRoomName);
     });
     socket.on('newMessage', (data) => {
       getMessages(true);
     });
 
     socket.emit('login', {
-      room: props.location.state.chatRoomName,
-      user: props.location.state.handle,
+      room: props.roomState.chatRoomName,
+      user: props.roomState.handle,
     });
 
-    socket.on('userConnect', function (data) {
+    socket.on('userConnect', data => {
       setOnlineUsers(data);
     });
 
     setInitialized(true);
   };
   const [distinct, setDistinct] = useState([]);
+
 
   useEffect(() => {
     // eslint-disable-next-line
@@ -148,7 +152,7 @@ function ChatRoomPage(props) {
   const isUserOnline = (u) => {
     // eslint-disable-next-line
     for (const [key, { room, user }] of Object.entries(onlineUsers)) {
-      if (user === u && room === props.location.state.chatRoomName) {
+      if (user === u && room === props.roomState.chatRoomName) {
         return true;
       }
     }
@@ -156,9 +160,9 @@ function ChatRoomPage(props) {
 
   const getMessages = async (scroll) => {
     const response = await getChatRoomMessages(
-      props.location.state.chatRoomName
+      props.roomState.chatRoomName
     );
-    console.log(response.data);
+    //console.log(response.data);
     setMessages(response.data);
     const dis = [];
     // eslint-disable-next-line
@@ -174,8 +178,7 @@ function ChatRoomPage(props) {
     if (scroll) {
       setTimeout(() => {
         var objDiv = document.getElementById('allmsg');
-        console.log(objDiv.scrollHeight);
-        objDiv.scrollTop = objDiv.scrollHeight + 300;
+        if(objDiv) objDiv.scrollTop = objDiv.scrollHeight + 300;
       }, 200);
     }
   };
@@ -206,10 +209,6 @@ function ChatRoomPage(props) {
     } else {
       setShow(threadId);
     }
-
-    console.log(viewThreadId);
-
-    console.log(threadId);
   };
 
   const [showEmojis, setShowEmojis] = useState(false);
@@ -244,7 +243,7 @@ function ChatRoomPage(props) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          chatRoomName: props.location.state.chatRoomName,
+          chatRoomName: props.roomState.chatRoomName,
           id: messages[i].id,
           reactions: JSON.stringify(obj),
         }),
@@ -277,42 +276,42 @@ function ChatRoomPage(props) {
     let allEmojis = ['like', 'heart', 'blush', 'smile', 'clap'];
     let list = [];
     for (let i = 0; i < 5; i++) {
-        if (obj[allEmojis[i]]) {
-            if (i === 0) {
-                list.push({
-                    e: '👍',
-                    num: obj[allEmojis[i]]
-                });
-            }
-
-            if (i === 1) {
-                list.push({
-                    e: '👎',
-                    num: obj[allEmojis[i]]
-                });
-            }
-
-            if (i === 2) {
-                list.push({
-                    e: '😍',
-                    num: obj[allEmojis[i]]
-                });
-            }
-
-            if (i === 3) {
-                list.push({
-                    e: '🤣',
-                    num: obj[allEmojis[i]]
-                });
-            }
-
-            if (i === 4) {
-                list.push({
-                    e: '👏',
-                    num: obj[allEmojis[i]]
-                });
-            }
+      if (obj[allEmojis[i]]) {
+        if (i === 0) {
+          list.push({
+            e: '👍',
+            num: obj[allEmojis[i]]
+          });
         }
+
+        if (i === 1) {
+          list.push({
+            e: '👎',
+            num: obj[allEmojis[i]]
+          });
+        }
+
+        if (i === 2) {
+          list.push({
+            e: '😍',
+            num: obj[allEmojis[i]]
+          });
+        }
+
+        if (i === 3) {
+          list.push({
+            e: '🤣',
+            num: obj[allEmojis[i]]
+          });
+        }
+
+        if (i === 4) {
+          list.push({
+            e: '👏',
+            num: obj[allEmojis[i]]
+          });
+        }
+      }
     }
 
     return list;
@@ -345,7 +344,7 @@ function ChatRoomPage(props) {
           <div className={classes.drawerContainer}>
             <List>
               <h3>
-                <i class="fas fa-comments"></i> Chair:
+                <i className="fas fa-comments"></i> Chair:
               </h3>
               <ListItem>
                 <HuddleName id="room-name">James Hodgkinson</HuddleName>
@@ -354,11 +353,11 @@ function ChatRoomPage(props) {
             <Divider />
             <List>
               <h3>
-                <i class="fas fa-users"></i> Users:
+                <i className="fas fa-users"></i> Users:
               </h3>
-              {distinct.map((m) => {
+              {distinct.map((m, index) => {
                 return m ? (
-                  <ListItem>
+                  <ListItem key={index}>
                     {isUserOnline(m) ? (
                       <>
                         <Name>{m}</Name>
@@ -386,16 +385,16 @@ function ChatRoomPage(props) {
         </Drawer>
         <JiscBoombox padding="xs">
           <Typography variant="h3">
-            Welcome to the Huddle {props.location.state.handle}
+            Welcome to the Huddle {props.roomState.handle}
           </Typography>
           <br></br>
           <Typography variant="h4">
-            Todays Huddle Title is: {props.location.state.chatRoomName}{' '}
+            Todays Huddle Title is: {props.roomState.chatRoomName}{' '}
           </Typography>
         </JiscBoombox>
 
         <div className="chat-room-page">
-          <div class="row">
+          <div className="row">
             <div className="chat-messages" id="allmsg">
               {messages
                 .filter((m) => m.threadId === null)
@@ -403,56 +402,56 @@ function ChatRoomPage(props) {
                   return (
                     <div
                       className="message"
-                      key={i}
                       style={{
                         minHeight: '120px',
                       }}
+                      key={i}
                     >
-                     <MessageHeader>
-                                                <div className= "message-head">
-                                                    <div className='author'>{m.author}</div>
-                                                    <div className='date'>{m.createdAt}</div>
-                                                </div>
+                      <MessageHeader>
+                        <div className="message-head">
+                          <div className='author'>{m.author}</div>
+                          <div className='date'><Moment format="MMMM Do YYYY, h:mm:ss a">{m.createdAt}</Moment></div>
+                        </div>
 
-                                                <ButtonWrapper>
-                                                    {props.location.state.handle === m.author ? (
-                                                        <DeleteButton
-                                                            onClick={async () => {
-                                                                deleteMsg(props.location.state.chatRoomName, m.id);
-                                                                setTimeout(() => {
-                                                                    getMessages();
-                                                                }, 1000);
-                                                            }}
-                                                        >
-                                                            Delete
-                                                        </DeleteButton>
-                                                    ) : null}
-                                                    <ViewThread
-                                                        onClick={() => {
-                                                            setViewThreadId(m.id);
-                                                            setShowReply(!showReply);
-                                                            setShow(showReply ? null : m.id);
-                                                        }}
-                                                    >
-                                                        Reply to message
-                                                    </ViewThread>
-                                                </ButtonWrapper>
-                                            </MessageHeader>
+                        <ButtonWrapper>
+                          {props.roomState.handle === m.author ? (
+                            <DeleteButton
+                              onClick={async () => {
+                                deleteMsg(props.roomState.chatRoomName, m.id);
+                                setTimeout(() => {
+                                  getMessages();
+                                }, 1000);
+                              }}
+                            >
+                              Delete
+                            </DeleteButton>
+                          ) : null}
+                          <ViewThread
+                            onClick={() => {
+                              setViewThreadId(m.id);
+                              setShowReply(!showReply);
+                              setShow(showReply ? null : m.id);
+                            }}
+                          >
+                            Reply to message
+                          </ViewThread>
+                        </ButtonWrapper>
+                      </MessageHeader>
 
-                                            <div className='row' style={{ position: 'relative' }}>
-                                                <div className='message-text'>{m.message}</div>
-                                                <div className='react-ct'>
-                                                    <div className='counter-ct'>
-                                                        {m.reactions
-                                                            ? m.reactions[0] === '{'
-                                                                ? getEmojiFromNmae(JSON.parse(m.reactions)).map(
-                                                                      ({ e, num }) => {
-                                                                          return <div>{`${e} ${num}`}</div>;
-                                                                      }
-                                                                  )
-                                                                : ''
-                                                            : ''}
-                                                    </div>
+                      <div className='row' style={{ position: 'relative' }}>
+                        <div className='message-text'>{m.message}</div>
+                        <div className='react-ct'>
+                          <div className='counter-ct'>
+                            {m.reactions
+                              ? m.reactions[0] === '{'
+                                ? getEmojiFromNmae(JSON.parse(m.reactions)).map(
+                                  ({ e, num }, index) => {
+                                    return <div key={index}>{`${e} ${num}`}</div>;
+                                  }
+                                )
+                                : ''
+                              : ''}
+                          </div>
                           <EmojiEmotionsIcon
                             onClick={() => {
                               setShowReactionBox(!showReactionBox);
@@ -506,10 +505,10 @@ function ChatRoomPage(props) {
                       <div className="row"></div>
                       {messages.filter((thread) => thread.threadId === m.id)
                         .length > 0 && (
-                        <Button onClick={() => handleReplyButton(m.id)}>
-                          {getNumberOfReplies(m.id)}
-                        </Button>
-                      )}
+                          <Button onClick={() => handleReplyButton(m.id)}>
+                            {getNumberOfReplies(m.id)}
+                          </Button>
+                        )}
 
                       {messages
                         .filter((thread) => thread.threadId === m.id)
@@ -518,7 +517,7 @@ function ChatRoomPage(props) {
                             <>
                               {show === m.threadId ? (
                                 <>
-                                  <div className="thread">
+                                  <div key={i} className="thread">
                                     <div className="row">
                                       <div className="author">{m.author}</div>
                                       <div className="date">{m.createdAt}</div>
@@ -559,7 +558,7 @@ function ChatRoomPage(props) {
                                 placeholder="Relpy to this message.."
                                 value={values.message || ''}
                                 onChange={handleChange}
-                                isInvalid={touched.message && errors.message}
+                                error={touched.message && errors.message}
                               />
                               <Button type="submit" style={{ float: 'right' }}>
                                 <KeyboardArrowRightRoundedIcon
@@ -603,7 +602,7 @@ function ChatRoomPage(props) {
                   placeholder="Type something here.."
                   value={values.message || ''}
                   onChange={handleChange}
-                  isInvalid={touched.message && errors.message}
+                  error={touched.message && errors.message}
                 />
                 <StyledEmojiReact
                   onClick={() => {
@@ -612,16 +611,16 @@ function ChatRoomPage(props) {
                 />
                 {showEmojis && (
                   <PickerWrapper>
-                  <StyledPicker
-                    onEmojiClick={(e, obj) => {
-                      setFieldValue(
-                        'message',
-                        values.message
-                          ? values.message + obj.emoji
-                          : '' + obj.emoji
-                      );
-                    }}
-                  ></StyledPicker>
+                    <StyledPicker
+                      onEmojiClick={(e, obj) => {
+                        setFieldValue(
+                          'message',
+                          values.message
+                            ? values.message + obj.emoji
+                            : '' + obj.emoji
+                        );
+                      }}
+                    ></StyledPicker>
                   </PickerWrapper>
                 )}
 

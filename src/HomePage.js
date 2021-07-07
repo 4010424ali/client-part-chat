@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { Formik } from 'formik';
 import * as yup from 'yup';
-import { Redirect } from 'react-router';
 import { joinRoom } from './requests';
 import styled from 'styled-components';
 import Avatar from '@material-ui/core/Avatar';
@@ -37,26 +36,25 @@ const schema = yup.object({
   chatRoomName: yup.string().required('Chat room is required'),
 });
 function HomePage(props) {
+  console.log("HomePage.js");
   const [v, set] = useState('');
   const chatRoomId = props.match.params.chatRoomId;
   const classes = useStyles();
 
   const [redirect, setRedirect] = useState(false);
-  const [chatRoomName, setChatRoomName] = useState({});
+  useEffect(() => {
+    // check local storage
+
+
+  }, [])
   // eslint-disable-next-line
   const [myEvt, setMyEvt] = useState({});
-  const handleSubmit = async (evt) => {};
+  const handleSubmit = async (evt) => { };
+
   if (redirect) {
-    return (
-      <Redirect
-        to={{
-          pathname: '/chatroom',
-          state: { chatRoomName: chatRoomName, handle: v },
-        }}
-      />
-    );
+    return null;
   }
-  return (
+  else return (
     <>
       <JiscBoombox>
         <Typography variant="h3">Welcome to OpenHuddle</Typography>
@@ -102,7 +100,7 @@ function HomePage(props) {
                   onChange={(e) => {
                     set(e.target.value);
                   }}
-                  isInvalid={touched.handle && errors.handle}
+                  error={touched.handle && errors.handle}
                 />
                 {/*<TextField
                                     variant='outlined'
@@ -131,8 +129,8 @@ function HomePage(props) {
 
                       await joinRoom(tmpchatRoomName);
                       setMyEvt(tmpmyEvt.handle);
-                      setChatRoomName(tmpchatRoomName);
                       setRedirect(true);
+                      props.updateRoomState({ chatRoomName: tmpchatRoomName, handle: v, chatRoomId })
                     }
                   }}
                 >
