@@ -68,7 +68,6 @@ const useStyles = makeStyles((theme) => ({
     width: '45px',
   },
 }));
-
 const SOCKET_IO_URL = 'https://stark-mesa-34467.herokuapp.com';
 const socket = io(SOCKET_IO_URL);
 /*const getChatData = () => {
@@ -79,8 +78,8 @@ const schema = yup.object({
 });
 
 function ChatRoomPage(props) {
-  console.log("ChatRoomPage.js");
-
+  //console.log("ChatRoomPage.js");
+  //console.log("lenght", props.roomState.charactersLimit);
   const classes = useStyles();
 
   const [viewThreadId, setViewThreadId] = useState(null);
@@ -100,8 +99,14 @@ function ChatRoomPage(props) {
     socket.emit('message', data);
     resetForm();
   };
+  const handleFormChange = (evt) => {
+    console.log("event", evt);
+    //evt.target.value = evt.target.value.substr(0,10); 
+  }
+
 
   const handleThreadSubmit = async (evt) => {
+    console.log(evt);
     const isValid = await schema.validate(evt);
     if (!isValid) {
       return;
@@ -214,6 +219,7 @@ function ChatRoomPage(props) {
   const [showEmojis, setShowEmojis] = useState(false);
   const [showReactionBox, setShowReactionBox] = useState(false);
   const [currentMsgId, setCurrentMsgId] = useState(undefined);
+  
 
   const getNumberOfReplies = (id) => {
     let num = 0;
@@ -556,7 +562,7 @@ function ChatRoomPage(props) {
                                 type="text"
                                 name="message"
                                 placeholder="Relpy to this message.."
-                                value={values.message || ''}
+                                value={values.message ? (props.roomState.charactersLimit ? values.message.substr(0,props.roomState.charactersLimit): values.message) : ''}
                                 onChange={handleChange}
                                 error={touched.message && errors.message}
                               />
@@ -578,6 +584,7 @@ function ChatRoomPage(props) {
             initialValues={{}}
             validationSchema={schema}
             onSubmit={handleSubmit}
+            onChange={handleFormChange}
           >
             {({
               handleSubmit,
@@ -600,7 +607,7 @@ function ChatRoomPage(props) {
                   type="text"
                   name="message"
                   placeholder="Type something here.."
-                  value={values.message || ''}
+                  value={values.message ? (props.roomState.charactersLimit ? values.message.substr(0,props.roomState.charactersLimit): values.message) : ''}
                   onChange={handleChange}
                   error={touched.message && errors.message}
                 />

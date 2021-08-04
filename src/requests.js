@@ -1,4 +1,5 @@
 const APIURL = 'https://stark-mesa-34467.herokuapp.com';
+//const APIURL = 'http://192.168.1.112:3000'
 const axios = require('axios');
 
 export const getChatRooms = () => axios.get(`${APIURL}/chatroom/chatrooms`);
@@ -22,6 +23,15 @@ export const getChatRoomName = async (chatRoomId) => {
   const roomName = await axios.get(`${APIURL}/chatroom/${chatRoomId}`);
   return roomName.data;
 };
+export const getChatRoomInofsFromSecureUrl = async (secureUrl) => {
+  const room = await axios.get(`${APIURL}/chatroom/infos/url/${secureUrl}`);
+  return room.data;
+};
+export const getChatRoomInofsFromId = async (id) => {
+  const room = await axios.get(`${APIURL}/chatroom/infos/id/${id}`);
+  return room.data;
+};
+
 /*
 export const getChatRoomName = async (chatRoomId) => {
   return '91';

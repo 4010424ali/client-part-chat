@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useState } from 'react';
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -15,7 +15,7 @@ import Container from '@material-ui/core/Container';
 
 import Button from '@material-ui/core/Button';
 import { JiscBoombox } from 'jisc-innovation-mui-components';
-import { getChatRoomName } from './requests';
+import { getChatRoomInofsFromId, getChatRoomInofsFromSecureUrl } from './requests';
 
 const useStyles = makeStyles((theme) => ({
   avatar: {
@@ -39,14 +39,11 @@ function HomePage(props) {
   console.log("HomePage.js");
   const [v, set] = useState('');
   const chatRoomId = props.match.params.chatRoomId;
+  const secureUrl = props.match.params.secureUrl;
   const classes = useStyles();
 
   const [redirect, setRedirect] = useState(false);
-  useEffect(() => {
-    // check local storage
 
-
-  }, [])
   // eslint-disable-next-line
   const [myEvt, setMyEvt] = useState({});
   const handleSubmit = async (evt) => { };
@@ -121,16 +118,26 @@ function HomePage(props) {
                   variant="contained"
                   color="primary"
                   onClick={async (evt) => {
-                    const tmpchatRoomName = await getChatRoomName(chatRoomId);
+                    let tmpRoomId = '';
+                    let tmpchatRoomName = '';
+                    let rm = {};
+                    if (secureUrl) {
+                      rm = await getChatRoomInofsFromSecureUrl(secureUrl);
+                      tmpRoomId = rm.id;
+                      tmpchatRoomName = rm.name;
+                    }
+                    if (chatRoomId) {
+                      rm = await getChatRoomInofsFromId(chatRoomId);
+                      tmpRoomId = rm.id;
+                      tmpchatRoomName = rm.name;
+                    }
                     const tmpmyEvt = evt;
-
                     if (tmpchatRoomName != null && tmpmyEvt != null) {
                       //localStorage.setItem("chatData", JSON.stringify(evt));
-
                       await joinRoom(tmpchatRoomName);
                       setMyEvt(tmpmyEvt.handle);
                       setRedirect(true);
-                      props.updateRoomState({ chatRoomName: tmpchatRoomName, handle: v, chatRoomId })
+                      props.updateRoomState({ chatRoomName: tmpchatRoomName, handle: v, chatRoomId: tmpRoomId, secureUrl: rm.secureUrl, charactersLimit: rm.charactersLimit })
                     }
                   }}
                 >
