@@ -353,7 +353,7 @@ function ChatRoomPage(props) {
                 <i className="fas fa-comments"></i> Chair:
               </h3>
               <ListItem>
-                <HuddleName id="room-name">James Hodgkinson</HuddleName>
+                <HuddleName id="room-name">Lawrie Phipps</HuddleName>
               </ListItem>
             </List>
             <Divider />
@@ -526,12 +526,89 @@ function ChatRoomPage(props) {
                                   <div key={i} className="thread">
                                     <div className="row">
                                       <div className="author">{m.author}</div>
-                                      <div className="date">{m.createdAt}</div>
+                                      <div className="date"><Moment format="MMMM Do YYYY, h:mm:ss a">{m.createdAt}</Moment></div>
                                     </div>
                                     <div className="thread-text">
                                       {m.message}
                                     </div>
+                                    {props.roomState.handle === m.author ? (
+                            <DeleteButtonThread
+                              onClick={async () => {
+                                deleteMsg(props.roomState.chatRoomName, m.id);
+                                setTimeout(() => {
+                                  getMessages();
+                                }, 1000);
+                              }}
+                            >
+                              Delete
+                            </DeleteButtonThread>
+                          ) : null}
+                          <div className='row' style={{ position: 'relative',  top: '-73px' }}>
+                        <div className='react-ct'>
+                          <div className='counter-ct'>
+                            {m.reactions
+                              ? m.reactions[0] === '{'
+                                ? getEmojiFromNmae(JSON.parse(m.reactions)).map(
+                                  ({ e, num }, index) => {
+                                    return <div key={index}>{`${e} ${num}`}</div>;
+                                  }
+                                )
+                                : ''
+                              : ''}
+                          </div>
+                          <EmojiEmotionsIcon
+                            onClick={() => {
+                              setShowReactionBox(!showReactionBox);
+                              setCurrentMsgId(m.id);
+                            }}
+                          />
+                          +
+                          {showReactionBox && currentMsgId === m.id ? (
+                            <div className="reaction-box">
+                              <button
+                                onClick={() => {
+                                  emjoiReact(m.id, 'like');
+                                }}
+                              >
+                                👍
+                              </button>
+
+                              <button
+                                onClick={() => {
+                                  emjoiReact(m.id, 'heart');
+                                }}
+                              >
+                                👎
+                              </button>
+                              <button
+                                onClick={() => {
+                                  emjoiReact(m.id, 'blush');
+                                }}
+                              >
+                                😍
+                              </button>
+                              <button
+                                onClick={() => {
+                                  emjoiReact(m.id, 'smile');
+                                }}
+                              >
+                                🤣
+                              </button>
+                              <button
+                                onClick={() => {
+                                  emjoiReact(m.id, 'clap');
+                                }}
+                              >
+                                👏
+                              </button>
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
+                          
                                   </div>
+                                  
+                                  
                                 </>
                               ) : null}
                             </>
@@ -561,16 +638,12 @@ function ChatRoomPage(props) {
                                 InputProps={{ disableUnderline: true }}
                                 type="text"
                                 name="message"
-                                placeholder="Relpy to this message.."
+                                placeholder="Reply to this message.."
                                 value={values.message ? (props.roomState.charactersLimit ? values.message.substr(0,props.roomState.charactersLimit): values.message) : ''}
                                 onChange={handleChange}
                                 error={touched.message && errors.message}
                               />
-                              <Button type="submit" style={{ float: 'right' }}>
-                                <KeyboardArrowRightRoundedIcon
-                                  className={classes.icon}
-                                ></KeyboardArrowRightRoundedIcon>
-                              </Button>
+                          
                             </form>
                           )}
                         </Formik>
@@ -694,6 +767,13 @@ const DeleteButton = styled(Button)`
    background-color: #fa5e02;
     color: #fff;
     margin-right: 20px;
+`;
+
+const DeleteButtonThread = styled(Button)`
+    background-color: #fa5e02;
+    color: #fff;
+    float: right;
+    top: -41px;
 `;
 const StyledPicker = styled(Picker)`
   right: 20px;

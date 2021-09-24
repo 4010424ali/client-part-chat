@@ -255,13 +255,14 @@ a {
   padding-right: 30px;
   margin-bottom: 15px;
   overflow: hidden;
+  margin-top: 10px;
+
 }
 
 .thread-text {
   background-color: #d0eff4;
   padding-left: 18px;
-  padding-right: 30px;
-}
+  margin-right: 120px;}
 
 .thread {
   background-color: #d0eff4;
