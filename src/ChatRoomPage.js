@@ -49,8 +49,8 @@ const useStyles = makeStyles((theme) => ({
   },
   drawerPaper: {
     width: drawerWidth,
-    background: '#166797',
-    color: 'white',
+    background: '#fff',
+    color: '#000',
     padding: '20px 20px 60px',
   },
   drawerContainer: {
@@ -739,7 +739,7 @@ const StyledSideBar = styled(Drawer)`
 `;
 
 const Name = styled(ListItemIcon)`
-  color: #fff;
+  color: #000;
 `;
 
 const HuddleName = styled.div`
