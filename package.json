@@ -3,7 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@material-ui/core": "^4.11.3",
+    "@emotion/react": "^11.4.1",
+    "@emotion/styled": "^11.3.0",
+    "@material-ui/core": "^4.12.3",
+    "@material-ui/icons": "^4.11.2",
+    "@mui/material": "^5.0.2",
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^12.8.3",
@@ -13,6 +17,7 @@
     "emoji-picker-react": "^3.4.4",
     "formik": "^2.2.6",
     "jisc-innovation-mui-components": "^0.7.6",
+    "material-ui-icons": "^1.0.0-beta.36",
     "moment": "^2.29.1",
     "prop-types": "^15.7.2",
     "react": "^17.0.2",
@@ -25,6 +30,7 @@
     "react-scripts": "4.0.0",
     "socket.io-client": "^2.4.0",
     "styled-components": "^5.2.1",
+    "typeface-roboto": "^1.1.13",
     "web-vitals": "^0.2.4",
     "yup": "^0.29.3"
   },

@@ -11,7 +11,8 @@ import KeyboardArrowRightRoundedIcon from '@material-ui/icons/KeyboardArrowRight
 // import { Picker } from "emoji-mart";
 import Picker from 'emoji-picker-react';
 import Moment from 'react-moment';
-
+import roboto from 'typeface-roboto';
+import { deepOrange, deepPurple } from '@material-ui/core/colors';
 
 import { JiscBoombox } from 'jisc-innovation-mui-components';
 
@@ -24,6 +25,7 @@ import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
+import Avatar from '@material-ui/core/Avatar';
 
 import EmojiEmotionsIcon from '@material-ui/icons/EmojiEmotions';
 
@@ -31,42 +33,46 @@ import logo from './logo.png';
 
 import styled from 'styled-components';
 import { StylesProvider } from '@material-ui/core/styles';
+import { Tooltip } from '@material-ui/core';
 
-const drawerWidth = '20%';
+const drawerWidth = '250px';
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-  },
-  appBar: {
-    zIndex: theme.zIndex.drawer + 1,
-    background: 'white',
-    color: 'black',
-  },
-  drawer: {
-    width: drawerWidth,
-    flexShrink: 0,
-  },
-  drawerPaper: {
-    width: drawerWidth,
-    background: '#fff',
-    color: '#000',
-    padding: '20px 20px 60px',
-  },
-  drawerContainer: {
-    overflow: 'auto',
-  },
-  content: {
-    flexGrow: 1,
-    padding: theme.spacing(3),
-  },
-  icon: {
-    backgroundColor: '#fa5e02',
-    borderRadius: '25px',
-    color: 'white',
-    height: '45px',
-    width: '45px',
-  },
+    root: {
+        display: 'flex'
+    },
+    appBar: {
+        /*     zIndex: theme.zIndex.drawer + 1,
+         */ background: 'white',
+        color: 'black'
+    },
+    drawer: {
+        width: 40,
+        flexShrink: 0
+    },
+    drawerPaper: {
+        width: drawerWidth,
+        background: '#fff',
+        color: '#000',
+        padding: '20px 20px 60px'
+    },
+    drawerContainer: {
+        overflow: 'auto'
+    },
+    content: {
+        flexGrow: 1,
+        padding: theme.spacing(3)
+    },
+    backColor: {
+        backgroundColor: '#1ed788'
+    },
+    icon: {
+        backgroundColor: '#fa5e02',
+        borderRadius: '25px',
+        color: 'white',
+        height: '45px',
+        width: '45px'
+    }
 }));
 const SOCKET_IO_URL = 'https://stark-mesa-34467.herokuapp.com';
 const socket = io(SOCKET_IO_URL);
@@ -74,306 +80,330 @@ const socket = io(SOCKET_IO_URL);
   return JSON.parse(this.state.handle, this.state.chatRoomName);
 };*/
 const schema = yup.object({
-  message: yup.string().required('Message is required'),
+    message: yup.string().required('Message is required')
 });
 
 function ChatRoomPage(props) {
-  //console.log("ChatRoomPage.js");
-  //console.log("lenght", props.roomState.charactersLimit);
-  const classes = useStyles();
+    //console.log("ChatRoomPage.js");
+    //console.log("lenght", props.roomState.charactersLimit);
+    const classes = useStyles();
 
-  const [viewThreadId, setViewThreadId] = useState(null);
-  const [initialized, setInitialized] = useState(false);
-  const [messages, setMessages] = useState([]);
-  // eslint-disable-next-line
-  const [rooms, setRooms] = useState([]);
-  const handleSubmit = async (evt, { resetForm }) => {
-    const isValid = await schema.validate(evt);
-    if (!isValid) {
-      return;
-    }
-    const data = Object.assign({}, evt);
-    data.chatRoomName = props.roomState.chatRoomName;
-    data.author = props.roomState.handle;
-    data.message = evt.message;
-    socket.emit('message', data);
-    resetForm();
-  };
-  const handleFormChange = (evt) => {
-    console.log("event", evt);
-    //evt.target.value = evt.target.value.substr(0,10); 
-  }
-
-
-  const handleThreadSubmit = async (evt) => {
-    console.log(evt);
-    const isValid = await schema.validate(evt);
-    if (!isValid) {
-      return;
-    }
-    const data = Object.assign({}, evt);
-    data.chatRoomName = props.roomState.chatRoomName;
-    data.threadId = viewThreadId;
-    data.author = props.roomState.handle;
-    data.message = evt.message;
-    socket.emit('message', data);
-    evt.target.reset();
-  };
-
-  const [onlineUsers, setOnlineUsers] = useState({});
-  const connectToRoom = () => {
-    socket.on('connect', (data) => {
-      socket.emit('join', props.roomState.chatRoomName);
-    });
-    socket.on('newMessage', (data) => {
-      getMessages(true);
-    });
-
-    socket.emit('login', {
-      room: props.roomState.chatRoomName,
-      user: props.roomState.handle,
-    });
-
-    socket.on('userConnect', data => {
-      setOnlineUsers(data);
-    });
-
-    setInitialized(true);
-  };
-  const [distinct, setDistinct] = useState([]);
-
-
-  useEffect(() => {
+    const [viewThreadId, setViewThreadId] = useState(null);
+    const [initialized, setInitialized] = useState(false);
+    const [messages, setMessages] = useState([]);
     // eslint-disable-next-line
-    for (const [key, { room, user }] of Object.entries(onlineUsers)) {
-      if (distinct.indexOf(user) < 0) {
-        setDistinct((prev) => {
-          return [...prev, user];
-        });
-      }
-    }
-  }, [onlineUsers, distinct]);
-
-  const isUserOnline = (u) => {
-    // eslint-disable-next-line
-    for (const [key, { room, user }] of Object.entries(onlineUsers)) {
-      if (user === u && room === props.roomState.chatRoomName) {
-        return true;
-      }
-    }
-  };
-
-  const getMessages = async (scroll) => {
-    const response = await getChatRoomMessages(
-      props.roomState.chatRoomName
-    );
-    //console.log(response.data);
-    setMessages(response.data);
-    const dis = [];
-    // eslint-disable-next-line
-    response.data.map((m) => {
-      if (dis.indexOf(m.author) === -1) {
-        dis.push(m.author);
-      }
-      // array-callback-return
-    });
-    setDistinct(dis);
-
-    setInitialized(true);
-    if (scroll) {
-      setTimeout(() => {
-        var objDiv = document.getElementById('allmsg');
-        if(objDiv) objDiv.scrollTop = objDiv.scrollHeight + 300;
-      }, 200);
-    }
-  };
-
-  const getRooms = async () => {
-    const response = await getChatRooms();
-    setRooms(response.data);
-    setInitialized(true);
-  };
-  useEffect(() => {
-    if (!initialized) {
-      getMessages(true);
-      connectToRoom();
-      getRooms();
-    }
-    // eslint-disable-next-line
-  }, []);
-
-  const [show, setShow] = useState(null);
-
-  const [showReply, setShowReply] = useState(false);
-
-  const handleReplyButton = (threadId) => {
-    // viewThreadId === m.id  ? setShow(m.id) : setShow(null)
-
-    if (threadId === show) {
-      setShow(null);
-    } else {
-      setShow(threadId);
-    }
-  };
-
-  const [showEmojis, setShowEmojis] = useState(false);
-  const [showReactionBox, setShowReactionBox] = useState(false);
-  const [currentMsgId, setCurrentMsgId] = useState(undefined);
-  
-
-  const getNumberOfReplies = (id) => {
-    let num = 0;
-    messages
-      .filter((thread) => thread.threadId === id)
-      // eslint-disable-next-line
-      .map((m, i) => {
-        num++;
-      });
-
-    return `Show ${num} replies`;
-  };
-
-  const emjoiReact = (id, rec) => {
-    let i;
-    messages.forEach((obj, index) => {
-      if (obj.id === id) {
-        i = index;
-      }
-    });
-    console.log(i);
-    const APIURL = 'https://stark-mesa-34467.herokuapp.com';
-    const update = (obj) => {
-      fetch(`${APIURL}/chatroom/chatroom/messages/reaction`, {
-        method: 'POST', // or 'PUT'
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          chatRoomName: props.roomState.chatRoomName,
-          id: messages[i].id,
-          reactions: JSON.stringify(obj),
-        }),
-      })
-        .then((response) => response.json())
-        .then(() => {
-          getMessages();
-          setShowReactionBox(false);
-        })
-        .catch((error) => {
-          console.error('Error:', error);
-        });
+    const [rooms, setRooms] = useState([]);
+    const handleSubmit = async (evt, { resetForm }) => {
+        const isValid = await schema.validate(evt);
+        if (!isValid) {
+            return;
+        }
+        const data = Object.assign({}, evt);
+        data.chatRoomName = props.roomState.chatRoomName;
+        data.author = props.roomState.handle;
+        data.message = evt.message;
+        socket.emit('message', data);
+        resetForm();
     };
-    if (!messages[i].reactions) {
-      const obj = {};
-      obj[rec] = 1;
-      update(obj);
-    } else {
-      const obj = JSON.parse(messages[i].reactions);
-      if (obj[rec]) {
-        obj[rec] = obj[rec] + 1;
-      } else {
-        obj[rec] = 1;
-      }
-      update(obj);
-    }
-  };
+    const handleFormChange = (evt) => {
+        console.log('event', evt);
+        //evt.target.value = evt.target.value.substr(0,10);
+    };
 
-  const getEmojiFromNmae = (obj) => {
-    let allEmojis = ['like', 'heart', 'blush', 'smile', 'clap'];
-    let list = [];
-    for (let i = 0; i < 5; i++) {
-      if (obj[allEmojis[i]]) {
-        if (i === 0) {
-          list.push({
-            e: '👍',
-            num: obj[allEmojis[i]]
-          });
+    const handleThreadSubmit = async (evt) => {
+        console.log(evt);
+        const isValid = await schema.validate(evt);
+        if (!isValid) {
+            return;
+        }
+        const data = Object.assign({}, evt);
+        data.chatRoomName = props.roomState.chatRoomName;
+        data.threadId = viewThreadId;
+        data.author = props.roomState.handle;
+        data.message = evt.message;
+        socket.emit('message', data);
+        evt.target.reset();
+    };
+
+    const [onlineUsers, setOnlineUsers] = useState({});
+    const connectToRoom = () => {
+        socket.on('connect', (data) => {
+            socket.emit('join', props.roomState.chatRoomName);
+        });
+        socket.on('newMessage', (data) => {
+            getMessages(true);
+        });
+
+        socket.emit('login', {
+            room: props.roomState.chatRoomName,
+            user: props.roomState.handle
+        });
+
+        socket.on('userConnect', (data) => {
+            setOnlineUsers(data);
+        });
+
+        setInitialized(true);
+    };
+    const [distinct, setDistinct] = useState([]);
+
+    useEffect(() => {
+        // eslint-disable-next-line
+        for (const [key, { room, user }] of Object.entries(onlineUsers)) {
+            if (distinct.indexOf(user) < 0) {
+                setDistinct((prev) => {
+                    return [...prev, user];
+                });
+            }
+        }
+    }, [onlineUsers, distinct]);
+
+    const isUserOnline = (u) => {
+        // eslint-disable-next-line
+        for (const [key, { room, user }] of Object.entries(onlineUsers)) {
+            if (user === u && room === props.roomState.chatRoomName) {
+                return true;
+            }
+        }
+    };
+
+    const getMessages = async (scroll) => {
+        const response = await getChatRoomMessages(props.roomState.chatRoomName);
+        //console.log(response.data);
+        setMessages(response.data);
+        const dis = [];
+        // eslint-disable-next-line
+        response.data.map((m) => {
+            if (dis.indexOf(m.author) === -1) {
+                dis.push(m.author);
+            }
+            // array-callback-return
+        });
+        setDistinct(dis);
+
+        setInitialized(true);
+        if (scroll) {
+            setTimeout(() => {
+                var objDiv = document.getElementById('allmsg');
+                if (objDiv) objDiv.scrollTop = objDiv.scrollHeight + 300;
+            }, 200);
+        }
+    };
+
+    const getRooms = async () => {
+        const response = await getChatRooms();
+        setRooms(response.data);
+        setInitialized(true);
+    };
+    useEffect(() => {
+        if (!initialized) {
+            getMessages(true);
+            connectToRoom();
+            getRooms();
+        }
+        // eslint-disable-next-line
+    }, []);
+
+    const [show, setShow] = useState(null);
+
+    const [showReply, setShowReply] = useState(false);
+
+    const handleReplyButton = (threadId) => {
+        // viewThreadId === m.id  ? setShow(m.id) : setShow(null)
+
+        if (threadId === show) {
+            setShow(threadId);
+        } else {
+            setShow(threadId);
+        }
+    };
+
+    const [showEmojis, setShowEmojis] = useState(false);
+    const [showReactionBox, setShowReactionBox] = useState(false);
+    const [currentMsgId, setCurrentMsgId] = useState(undefined);
+
+    const getNumberOfReplies = (id) => {
+        let num = 0;
+        messages
+            .filter((thread) => thread.threadId === id)
+            // eslint-disable-next-line
+            .map((m, i) => {
+                num++;
+            });
+
+        return `Show ${num} replies`;
+    };
+
+    const emjoiReact = (id, rec) => {
+        let i;
+        messages.forEach((obj, index) => {
+            if (obj.id === id) {
+                i = index;
+            }
+        });
+        console.log(i);
+        const APIURL = 'https://stark-mesa-34467.herokuapp.com';
+        const update = (obj) => {
+            fetch(`${APIURL}/chatroom/chatroom/messages/reaction`, {
+                method: 'POST', // or 'PUT'
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    chatRoomName: props.roomState.chatRoomName,
+                    id: messages[i].id,
+                    reactions: JSON.stringify(obj)
+                })
+            })
+                .then((response) => response.json())
+                .then(() => {
+                    getMessages();
+                    setShowReactionBox(false);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        };
+        if (!messages[i].reactions) {
+            const obj = {};
+            obj[rec] = 1;
+            update(obj);
+        } else {
+            const obj = JSON.parse(messages[i].reactions);
+            if (obj[rec]) {
+                obj[rec] = obj[rec] + 1;
+            } else {
+                obj[rec] = 1;
+            }
+            update(obj);
+        }
+    };
+
+    const getEmojiFromNmae = (obj) => {
+        let allEmojis = ['like', 'heart', 'blush', 'smile', 'clap'];
+        let list = [];
+        for (let i = 0; i < 5; i++) {
+            if (obj[allEmojis[i]]) {
+                if (i === 0) {
+                    list.push({
+                        e: '👍',
+                        num: obj[allEmojis[i]]
+                    });
+                }
+
+                if (i === 1) {
+                    list.push({
+                        e: '👎',
+                        num: obj[allEmojis[i]]
+                    });
+                }
+
+                if (i === 2) {
+                    list.push({
+                        e: '😍',
+                        num: obj[allEmojis[i]]
+                    });
+                }
+
+                if (i === 3) {
+                    list.push({
+                        e: '🤣',
+                        num: obj[allEmojis[i]]
+                    });
+                }
+
+                if (i === 4) {
+                    list.push({
+                        e: '👏',
+                        num: obj[allEmojis[i]]
+                    });
+                }
+            }
         }
 
-        if (i === 1) {
-          list.push({
-            e: '👎',
-            num: obj[allEmojis[i]]
-          });
-        }
+        return list;
+    };
+    return (
+        <>
+            <StylesProvider injectFirst>
+                {/* <AppBar
+        position="fixed"
+        sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px` }}
+      > */}
+                <AppBar position='fixed' className={classes.appBar}>
+                    <Toolbar>
+                        <img alt='logo' src={logo} width='30' height='30' className='d-inline-block align-top' />{' '}
+                        <Typography variant='h5' style={{ marginLeft: '20px' }} noWrap>
+                            OpenHuddle
+                        </Typography>
+                    </Toolbar>
+                </AppBar>
+                <Drawer
+                    sx={{
+                        width: drawerWidth,
+                        flexShrink: 0,
+                        '& .MuiDrawer-paper': {
+                            width: drawerWidth,
+                            boxSizing: 'border-box'
+                        }
+                    }}
+                    variant='permanent'
+                    anchor='left'
+                >
+                    <Toolbar>
+                        <img alt='logo' src={logo} width='30' height='30' className='d-inline-block align-top' />
+                        <Typography variant='h5' style={{ marginLeft: '20px' }} noWrap>
+                            OpenHuddle
+                        </Typography>
+                    </Toolbar>
+                    <Divider />
+                    <Chair>
+                        <ChairTitle>Chair</ChairTitle>
+                        <ChairAvatar>LP</ChairAvatar>
 
-        if (i === 2) {
-          list.push({
-            e: '😍',
-            num: obj[allEmojis[i]]
-          });
-        }
+                        <ChairName>Lawrie Phipps</ChairName>
+                    </Chair>
+                    <Divider />
 
-        if (i === 3) {
-          list.push({
-            e: '🤣',
-            num: obj[allEmojis[i]]
-          });
-        }
-
-        if (i === 4) {
-          list.push({
-            e: '👏',
-            num: obj[allEmojis[i]]
-          });
-        }
-      }
-    }
-
-    return list;
-  };
-  return (
-    <>
-      <StylesProvider injectFirst>
-        <AppBar position="fixed" className={classes.appBar}>
-          <Toolbar>
-            <img
-              alt="logo"
-              src={logo}
-              width="30"
-              height="30"
-              className="d-inline-block align-top"
-            />{' '}
-            <Typography variant="h5" style={{ marginLeft: '20px' }} noWrap>
-              OpenHuddle
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <Drawer
+                    {/*   <Drawer
           className={classes.drawer}
           variant="permanent"
           classes={{
             paper: classes.drawerPaper,
           }}
-        >
-          <Toolbar />
-          <div className={classes.drawerContainer}>
-            <List>
+        > */}
+                    <div className={classes.drawerContainer}>
+                        {/*  <List>
               <h3>
                 <i className="fas fa-comments"></i> Chair:
               </h3>
               <ListItem>
                 <HuddleName id="room-name">Lawrie Phipps</HuddleName>
               </ListItem>
-            </List>
-            <Divider />
-            <List>
-              <h3>
-                <i className="fas fa-users"></i> Users:
-              </h3>
-              {distinct.map((m, index) => {
-                return m ? (
-                  <ListItem key={index}>
-                    {isUserOnline(m) ? (
-                      <>
-                        <Name>{m}</Name>
-                        <div className="online-user"></div>
-                      </>
-                    ) : (
-                      <Name>{m}</Name>
-                    )}
+            </List> */}
+                        <List>
+                            <UserTitle>Users</UserTitle>
+                            {distinct.map((m, index) => {
+                                return m ? (
+                                    <UserList key={index}>
+                                        {isUserOnline(m) ? (
+                                            <>
+                                                <OnlineUser>
+                                                    <OnlineAvatar>{m.charAt(0)}</OnlineAvatar>
+                                                    <OnlineName>{m}</OnlineName>
+                                                </OnlineUser>
+              
+                                            </>
+                                        ) : (
+                                            <OfflineUser>
+                                                    <OfflineAvatar>{m.charAt(0)}</OfflineAvatar>
+                                                    <OfflineName>
+                                                    {m}
+                                                </OfflineName>
+                                            </OfflineUser>
+                                        )}
 
-                    {/* {Object.keys(onlineUsers).map((key, i) => {
+                                        {/* {Object.keys(onlineUsers).map((key, i) => {
                       const { name, room } = onlineUsers[key];
                       console.log(name);
                       return (
@@ -383,23 +413,17 @@ function ChatRoomPage(props) {
                         </>
                       );
                     })} */}
-                  </ListItem>
-                ) : null;
-              })}
-            </List>
-          </div>
-        </Drawer>
-        <JiscBoombox padding="xs">
-          <Typography variant="h3">
-            Welcome to the Huddle {props.roomState.handle}
-          </Typography>
-          <br></br>
-          <Typography variant="h4">
-            Todays Huddle Title is: {props.roomState.chatRoomName}{' '}
-          </Typography>
-        </JiscBoombox>
-
-        <div className="chat-room-page">
+                                    </UserList>
+                                ) : null;
+                            })}
+                        </List>
+                    </div>
+                </Drawer>
+                <WelcomeBar>
+                <WelcomeHeader>Welcome to the Huddle {props.roomState.handle}</WelcomeHeader>
+                <WelcomeBody>Todays Huddle Title is: {props.roomState.chatRoomName}{' '} </WelcomeBody>
+            </WelcomeBar>
+            <div className="chat-room-page">
           <div className="row">
             <div className="chat-messages" id="allmsg">
               {messages
@@ -409,7 +433,7 @@ function ChatRoomPage(props) {
                     <div
                       className="message"
                       style={{
-                        minHeight: '120px',
+                        minHeight: '150px',
                       }}
                       key={i}
                     >
@@ -432,19 +456,11 @@ function ChatRoomPage(props) {
                               Delete
                             </DeleteButton>
                           ) : null}
-                          <ViewThread
-                            onClick={() => {
-                              setViewThreadId(m.id);
-                              setShowReply(!showReply);
-                              setShow(showReply ? null : m.id);
-                            }}
-                          >
-                            Reply to message
-                          </ViewThread>
+                         
                         </ButtonWrapper>
                       </MessageHeader>
 
-                      <div className='row' style={{ position: 'relative' }}>
+                      <div className='message-row' style={{ position: 'relative'}}>
                         <div className='message-text'>{m.message}</div>
                         <div className='react-ct'>
                           <div className='counter-ct'>
@@ -511,10 +527,25 @@ function ChatRoomPage(props) {
                       <div className="row"></div>
                       {messages.filter((thread) => thread.threadId === m.id)
                         .length > 0 && (
-                          <Button onClick={() => handleReplyButton(m.id)}>
+                          <Replies onClick={() => {handleReplyButton(m.id); setViewThreadId(m.id);
+                            setShowReply(!showReply);
+                            setShow(showReply ? null : m.id);
+                          }}>
                             {getNumberOfReplies(m.id)}
-                          </Button>
+                          </Replies>
                         )}
+                         {messages.filter((thread) => thread.threadId === m.id)
+                        .length <= 0 && (
+                      <ViewThread
+                            onClick={() => {
+                              setViewThreadId(m.id);
+                              setShowReply(!showReply);
+                              setShow(showReply ? null : m.id);
+                            }}
+                          >
+                            Reply to message
+                          </ViewThread>
+                                                  )}
 
                       {messages
                         .filter((thread) => thread.threadId === m.id)
@@ -525,7 +556,8 @@ function ChatRoomPage(props) {
                                 <>
                                   <div key={i} className="thread">
                                     <div className="row">
-                                      <div className="author">{m.author}</div>
+                                      <ThreadAvatar>{m.author.charAt(0)}</ThreadAvatar>
+                                      <div className="author"> {m.author}</div>
                                       <div className="date"><Moment format="MMMM Do YYYY, h:mm:ss a">{m.createdAt}</Moment></div>
                                     </div>
                                     <div className="thread-text">
@@ -543,7 +575,7 @@ function ChatRoomPage(props) {
                               Delete
                             </DeleteButtonThread>
                           ) : null}
-                          <div className='row' style={{ position: 'relative',  top: '-73px' }}>
+                          <div className='thread-emoji-row'>
                         <div className='react-ct'>
                           <div className='counter-ct'>
                             {m.reactions
@@ -607,9 +639,11 @@ function ChatRoomPage(props) {
                       </div>
                           
                                   </div>
+
                                   
                                   
                                 </>
+                                
                               ) : null}
                             </>
                           );
@@ -722,49 +756,81 @@ function ChatRoomPage(props) {
           </Formik>
         </div>
       </StylesProvider>
-    </>
-  );
+        </>
+    );
 }
 export default ChatRoomPage;
 
 // eslint-disable-next-line
-const StyledSideBar = styled(Drawer)`
-  background: var(--dark-color-b);
-  color: #fff;
-  padding: 20px 20px 60px;
-  overflow-y: scroll;
-  width: 20%;
-  height: 100%;
-  position: absolute;
+/* const StyledSideBar = styled(Drawer)`
+    background: var(--dark-color-b);
+    color: #fff;
+    padding: 20px 20px 60px;
+    overflow-y: scroll;
+    width: 20%;
+    height: 100%;
+    position: absolute;
+`; */
+
+const OnlineUser = styled(ListItem)`
+    color: #fff;
+    background: #4eb8fe;
+    height: 70px;
+    width: 100%;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
 `;
 
-const Name = styled(ListItemIcon)`
-  color: #000;
+const OnlineName = styled(ListItemIcon)`
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+`;
+
+const UserList = styled(ListItem)`
+    padding-left: 0px;
+`;
+
+const OfflineUser = styled(ListItem)`
+    color: #000;
+    height: 70px;
+    width: 100%;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    opacity:0.5;
+`;
+
+const OfflineName = styled(ListItemIcon)`
+    color: #000;
+    text-align: center;
+    padding: 20px;
+    
+
 `;
 
 const HuddleName = styled.div`
-  font-size: 20px;
-  background: rgba(0, 0, 0, 0.1);
-  padding: 10px;
-  margin-bottom: 20px;
+    font-size: 1.5em;
+    background: rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    margin-bottom: 20px;
 `;
 
 const StyledInput = styled(TextField)`
-  width: 80%;
-  margin-top: 15px;
-  border-radius: 20px;
-  margin-left: 25px;
-  margin-bottom: 30px;
-  position: relative;
+    width: 80%;
+    margin-top: 15px;
+    border-radius: 20px;
+    margin-left: 25px;
+    margin-bottom: 30px;
+    position: relative;
 `;
 
 const ViewThread = styled(Button)`
-   background-color: #fa5e02;
-    color: #fff;
+    background-color: #fff;
+    color: #408fb5;
 `;
 
 const DeleteButton = styled(Button)`
-   background-color: #fa5e02;
+    background-color: #fa5e02;
     color: #fff;
     margin-right: 20px;
 `;
@@ -776,8 +842,8 @@ const DeleteButtonThread = styled(Button)`
     top: -41px;
 `;
 const StyledPicker = styled(Picker)`
-  right: 20px;
-  position: absolute;
+    right: 20px;
+    position: absolute;
 `;
 
 const StyledEmojiReact = styled(EmojiEmotionsIcon)`
@@ -794,10 +860,98 @@ const PickerWrapper = styled.div`
     bottom: calc(100% - -10px);
 `;
 
-const ButtonWrapper = styled.div`
-`;
+const ButtonWrapper = styled.div``;
 
 const MessageHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
+    display: flex;
+    justify-content: space-between;
 `;
+
+const Chair = styled(Toolbar)`
+    height: 200px;
+    background-color: #fafafa;
+    display: block;
+    width: 250px;
+`;
+
+const ChairTitle = styled(Typography)`
+    font-family: roboto;
+    text-align: center;
+    font-weight: 400;
+    font-size: 1.75em;
+    margin-top: 20px;
+`;
+
+const UserTitle = styled(Typography)`
+    font-family: roboto;
+    margin-left: 20px;
+    font-weight: 400;
+    font-size: 1.5em;
+    margin-top: 20px;
+    margin-bottom: 10px;
+`;
+
+const ChairName = styled(Typography)`
+    font-family: roboto;
+    text-align: center;
+    font-size: 1.2em;
+    margin-top: 10px;
+`;
+
+const ChairAvatar = styled(Avatar)`
+    margin-left: 34%;
+    padding: 34px;
+    margin-top: 10px;
+`;
+
+const OnlineAvatar = styled(Avatar)`
+    background-color: #fff;
+    color: green;
+`;
+
+const OfflineAvatar = styled(Avatar)`
+    color: red;
+
+`;
+
+const WelcomeBar = styled(Toolbar)`
+    background-color: #12ba8e;
+    color: #fff;
+    padding: 5px;
+    margin-top: 10px;
+    display:block;
+`;
+
+const WelcomeHeader = styled(Typography)`
+    color: #fff;
+    text-align:center;
+    font-weight: 400;
+    font-size: 1.75em;
+`;
+
+const WelcomeBody = styled(Typography)`
+    color: #fff;
+    text-align:center;
+    margin-bottom:10px;
+`;
+
+
+const ChatMessage = styled.div`
+  
+  padding: 30px;
+  max-height: 65vh;
+  overflow-y: scroll;
+
+`;
+
+const Replies = styled(Button)`
+    background-color: #fff;
+    color: #408fb5;
+`;
+
+const ThreadAvatar = styled(Avatar)`
+    padding:10px;
+`;
+
+
+
