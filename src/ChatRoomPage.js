@@ -753,7 +753,7 @@ function ChatRoomPage(props) {
                   </PickerWrapper>
                 )}
 
-                <Button
+                <StyledSubmit
                   type="submit"
                   style={{
                     float: 'right',
@@ -765,7 +765,7 @@ function ChatRoomPage(props) {
                   <KeyboardArrowRightRoundedIcon
                     className={classes.icon}
                   ></KeyboardArrowRightRoundedIcon>
-                </Button>
+                </StyledSubmit>
               </form>
             )}
           </Formik>
@@ -869,6 +869,9 @@ const StyledEmojiReact = styled(EmojiEmotionsIcon)`
     cursor: pointer;
     float: right;
     margin-right: 80px;
+    @media (max-width: 768px) {
+      margin-right: 10px;
+  }
 `;
 
 const PickerWrapper = styled.div`
@@ -980,3 +983,12 @@ const HideDrawer = styled.div`
   }
 
 `;
+
+
+const StyledSubmit = styled(Button)`
+  @media (max-width: 768px) {
+    display:none;
+  }
+
+`;
+
