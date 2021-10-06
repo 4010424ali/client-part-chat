@@ -61,7 +61,7 @@ const useStyles = makeStyles((theme) => ({
         padding: '20px 20px 60px'
     },
     drawerContainer: {
-        overflow: 'auto'
+        overflow: 'auto',
     },
 
     content: {
@@ -381,6 +381,8 @@ function ChatRoomPage(props) {
             paper: classes.drawerPaper,
           }}
         > */}
+                                                <UserTitle>Users</UserTitle>
+
                     <div className={classes.drawerContainer}>
                         {/*  <List>
               <h3>
@@ -390,8 +392,8 @@ function ChatRoomPage(props) {
                 <HuddleName id="room-name">Lawrie Phipps</HuddleName>
               </ListItem>
             </List> */}
+
                         <List>
-                            <UserTitle>Users</UserTitle>
                             {distinct.map((m, index) => {
                                 return m ? (
                                     <UserList key={index}>
@@ -886,7 +888,6 @@ const Chair = styled(Toolbar)`
     height: 200px;
     background-color: #fafafa;
     display: block;
-    width: 250px;
 `;
 
 const ChairTitle = styled(Typography)`
