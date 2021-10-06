@@ -348,6 +348,7 @@ function ChatRoomPage(props) {
                         </Typography>
                     </Toolbar>
                 </AppBar>
+                <HideDrawer>
                 <Drawer
                     sx={{
                         width: drawerWidth,
@@ -431,6 +432,7 @@ function ChatRoomPage(props) {
                         </List>
                     </div>
                 </Drawer>
+                </HideDrawer>
                 <WelcomeBar>
                 <WelcomeHeader>Welcome to the Huddle {props.roomState.handle}</WelcomeHeader>
                 <WelcomeBody>Todays Huddle Title is: {props.roomState.chatRoomName}{' '} </WelcomeBody>
@@ -975,3 +977,9 @@ const ThreadAvatar = styled(Avatar)`
 
 
 
+const HideDrawer = styled.div`
+  @media (max-width: 768px) {
+    display:none;
+  }
+
+`;

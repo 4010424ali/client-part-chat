@@ -113,6 +113,12 @@ a {
   height: 80vh;
 }
 
+@media only screen and (max-width: 600px) {
+  .chat-room-page {
+    padding-left:0;
+  }}
+
+
 .chat-sidebar {
   background: var(--dark-color-b);
   color: #fff;
@@ -152,6 +158,15 @@ a {
   overflow-wrap: break-word;
   position: relative;
 }
+@media only screen and (max-width: 600px) {
+  .chat-messages .message  {
+    width:100%
+  }}
+
+  @media only screen and (max-width: 600px) {
+    .thread-text  {
+      width:100%
+    }}
 
 .chat-messages .message .meta {
   font-size: 15px;
@@ -317,6 +332,8 @@ a {
   margin-bottom: 20px;
   margin-left: 24px;
   border: #eef2f5 0.2px solid;
+  box-shadow: 0 0px 0px 0 rgb(0 0 0 / 11%), 0 -1px 6px 0 rgb(0 0 0 / 15%);
+
 
 }
 
