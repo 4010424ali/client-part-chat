@@ -13,18 +13,19 @@
 
 
 .chat-messages .message {
-  margin-bottom: 15px;
+  margin-bottom: 40px;
   background-color: palegoldenrod;
-  border-radius: 5px;
+  border-radius: 17px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   overflow-wrap: break-word;
   width: 80%;
   padding-bottom: 2px;
 }
 
 .message {
-  margin-bottom: 15px;
+  margin-bottom: 40px;
   background-color: palegoldenrod;
-  border-radius: 5px;
+  border-radius: 17px;
   overflow-wrap: break-word;
   padding-bottom: 2px;
 }
@@ -145,10 +146,11 @@ a {
 }
 
 .chat-messages .message {
-  margin-bottom: 15px;
+  margin-bottom: 40px;
   background-color: #fff;
-  border-radius: 5px;
+  border-radius: 17px;
   overflow-wrap: break-word;
+  position: relative;
 }
 
 .chat-messages .message .meta {
@@ -252,25 +254,47 @@ a {
   padding: 15px;
   font-size: 1.2em;
   color: #000;
-  font-weight: 400;
+  font-weight: 600;
+  margin-left: 10px;
+    margin-top: 8px;
+}
+
+.thread-author{
+  font-size: 1.2em;
+  color: #000;
+  font-weight: 600;
+  margin-left: 10px;
+    margin-top: 8px;
 }
 
 .date {
   padding-left: 0px;
   font-size: small;
   color: #7eb1ee;
-  margin-top:18px;
+  margin-top:30px;
+}
+
+.thread-row {
+  margin-bottom: 18px;
+}
+
+.thread-date {
+  padding-left: 10px;
+  font-size: small;
+  color: #7eb1ee;
+  margin-top:15px;
 }
 
 .message-text {
-  color: #4d5050;
-  padding-left: 30px;
+  color: #000;
+  padding-left: 37px;
   padding-right: 30px;
   margin-bottom: 15px;
   overflow: hidden;
   margin-top: 10px;
   border-bottom: #a7b6b6 1px solid;
   padding-bottom: 30px;
+  font-weight: 400;
 
 
 }
@@ -278,7 +302,9 @@ a {
 .thread-text {
   background-color: #fff;
   padding-left: 18px;
-  margin-right: 120px;}
+  margin-right: 120px;
+  margin-bottom: 13px;
+}
 
 
 
@@ -300,6 +326,8 @@ a {
   height: 64px;
   width: 80%;
   margin-bottom: 35px;
+  margin-left: 26px;
+  background-color: white
 
 }
 .reaction-box button {
@@ -311,12 +339,19 @@ a {
   transition: all 0.2s;
 }
 
+.delete-thread{
+}
+
 .react-ct {
+  margin-right: 10px;
   display: flex;
   align-items: center;
   padding-bottom: 20px;
-  right: 2%;
   float: right;
+}
+
+.menu{
+  width: 20px;
 }
 .thread-emoji-row{
   position: relative;
@@ -349,3 +384,18 @@ a {
   padding-bottom: 0px;
 
 }
+/* .message:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0%;
+  top: 77.4%;
+  width: 0;
+  height: 0;
+  border: 45px solid #fff;
+  border-top-color: transparent;
+  border-bottom: 0;
+  border-left: 0;
+  margin-left: -25.5px;
+  margin-bottom: -53px;
+} */

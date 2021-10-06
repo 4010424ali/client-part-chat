@@ -26,6 +26,10 @@ import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import Avatar from '@material-ui/core/Avatar';
+import IconButton from '@material-ui/core/IconButton';
+import DeleteIcon from '@material-ui/icons/Delete';
+
+
 
 import EmojiEmotionsIcon from '@material-ui/icons/EmojiEmotions';
 
@@ -34,6 +38,8 @@ import logo from './logo.png';
 import styled from 'styled-components';
 import { StylesProvider } from '@material-ui/core/styles';
 import { Tooltip } from '@material-ui/core';
+
+
 
 const drawerWidth = '250px';
 
@@ -47,8 +53,10 @@ const useStyles = makeStyles((theme) => ({
         color: 'black'
     },
     drawer: {
+      [theme.breakpoints.up('sm')]: {
         width: 40,
-        flexShrink: 0
+        flexShrink: 0,
+      },
     },
     drawerPaper: {
         width: drawerWidth,
@@ -59,6 +67,7 @@ const useStyles = makeStyles((theme) => ({
     drawerContainer: {
         overflow: 'auto'
     },
+
     content: {
         flexGrow: 1,
         padding: theme.spacing(3)
@@ -110,7 +119,7 @@ function ChatRoomPage(props) {
         //evt.target.value = evt.target.value.substr(0,10);
     };
 
-    const handleThreadSubmit = async (evt) => {
+    const handleThreadSubmit = async (evt, { resetForm }) => {
         console.log(evt);
         const isValid = await schema.validate(evt);
         if (!isValid) {
@@ -122,7 +131,7 @@ function ChatRoomPage(props) {
         data.author = props.roomState.handle;
         data.message = evt.message;
         socket.emit('message', data);
-        evt.target.reset();
+        resetForm();
     };
 
     const [onlineUsers, setOnlineUsers] = useState({});
@@ -279,6 +288,7 @@ function ChatRoomPage(props) {
         }
     };
 
+
     const getEmojiFromNmae = (obj) => {
         let allEmojis = ['like', 'heart', 'blush', 'smile', 'clap'];
         let list = [];
@@ -343,12 +353,14 @@ function ChatRoomPage(props) {
                         width: drawerWidth,
                         flexShrink: 0,
                         '& .MuiDrawer-paper': {
-                            width: drawerWidth,
+                            width: 100,
                             boxSizing: 'border-box'
                         }
                     }}
                     variant='permanent'
                     anchor='left'
+                    className='menu'
+
                 >
                     <Toolbar>
                         <img alt='logo' src={logo} width='30' height='30' className='d-inline-block align-top' />
@@ -431,7 +443,7 @@ function ChatRoomPage(props) {
                 .map((m, i) => {
                   return (
                     <div
-                      className="message"
+                      className="message bubble-bottom-left"
                       style={{
                         minHeight: '150px',
                       }}
@@ -445,7 +457,8 @@ function ChatRoomPage(props) {
 
                         <ButtonWrapper>
                           {props.roomState.handle === m.author ? (
-                            <DeleteButton
+                            <IconButton
+                            color="warning"
                               onClick={async () => {
                                 deleteMsg(props.roomState.chatRoomName, m.id);
                                 setTimeout(() => {
@@ -453,8 +466,8 @@ function ChatRoomPage(props) {
                                 }, 1000);
                               }}
                             >
-                              Delete
-                            </DeleteButton>
+                              <DeleteIcon/>
+                            </IconButton>
                           ) : null}
                          
                         </ButtonWrapper>
@@ -555,16 +568,13 @@ function ChatRoomPage(props) {
                               {show === m.threadId ? (
                                 <>
                                   <div key={i} className="thread">
-                                    <div className="row">
+                                    <div className="row thread-row">
                                       <ThreadAvatar>{m.author.charAt(0)}</ThreadAvatar>
-                                      <div className="author"> {m.author}</div>
-                                      <div className="date"><Moment format="MMMM Do YYYY, h:mm:ss a">{m.createdAt}</Moment></div>
-                                    </div>
-                                    <div className="thread-text">
-                                      {m.message}
-                                    </div>
-                                    {props.roomState.handle === m.author ? (
-                            <DeleteButtonThread
+                                      <div className="thread-author"> {m.author}</div>
+                                      <div className="thread-date"><Moment format="MMMM Do YYYY, h:mm:ss a">{m.createdAt}</Moment></div>
+                                      {props.roomState.handle === m.author ? (
+                            <IconButton
+                              className='delete-thread'
                               onClick={async () => {
                                 deleteMsg(props.roomState.chatRoomName, m.id);
                                 setTimeout(() => {
@@ -572,9 +582,14 @@ function ChatRoomPage(props) {
                                 }, 1000);
                               }}
                             >
-                              Delete
-                            </DeleteButtonThread>
+                              <DeleteIcon/>
+                            </IconButton>
                           ) : null}
+                                    </div>
+                                    <div className="thread-text">
+                                      {m.message}
+                                    </div>
+                                    
                           <div className='thread-emoji-row'>
                         <div className='react-ct'>
                           <div className='counter-ct'>
@@ -827,6 +842,8 @@ const StyledInput = styled(TextField)`
 const ViewThread = styled(Button)`
     background-color: #fff;
     color: #408fb5;
+    margin-left: 23px;
+    margin-bottom: 10px;
 `;
 
 const DeleteButton = styled(Button)`
@@ -839,7 +856,7 @@ const DeleteButtonThread = styled(Button)`
     background-color: #fa5e02;
     color: #fff;
     float: right;
-    top: -41px;
+    right: -250px;
 `;
 const StyledPicker = styled(Picker)`
     right: 20px;
@@ -947,10 +964,13 @@ const ChatMessage = styled.div`
 const Replies = styled(Button)`
     background-color: #fff;
     color: #408fb5;
+    margin-left: 23px;
+    margin-bottom: 10px;
 `;
 
 const ThreadAvatar = styled(Avatar)`
     padding:10px;
+    margin-left: 25px;
 `;
 
 
