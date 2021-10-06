@@ -11,10 +11,7 @@ import KeyboardArrowRightRoundedIcon from '@material-ui/icons/KeyboardArrowRight
 // import { Picker } from "emoji-mart";
 import Picker from 'emoji-picker-react';
 import Moment from 'react-moment';
-import roboto from 'typeface-roboto';
-import { deepOrange, deepPurple } from '@material-ui/core/colors';
 
-import { JiscBoombox } from 'jisc-innovation-mui-components';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -37,7 +34,6 @@ import logo from './logo.png';
 
 import styled from 'styled-components';
 import { StylesProvider } from '@material-ui/core/styles';
-import { Tooltip } from '@material-ui/core';
 
 
 
@@ -825,12 +821,12 @@ const OfflineName = styled(ListItemIcon)`
 
 `;
 
-const HuddleName = styled.div`
+/* const HuddleName = styled.div`
     font-size: 1.5em;
     background: rgba(0, 0, 0, 0.1);
     padding: 10px;
     margin-bottom: 20px;
-`;
+`; */
 
 const StyledInput = styled(TextField)`
     width: 80%;
@@ -848,18 +844,18 @@ const ViewThread = styled(Button)`
     margin-bottom: 10px;
 `;
 
-const DeleteButton = styled(Button)`
+/* const DeleteButton = styled(Button)`
     background-color: #fa5e02;
     color: #fff;
     margin-right: 20px;
-`;
+`; */
 
-const DeleteButtonThread = styled(Button)`
+/* const DeleteButtonThread = styled(Button)`
     background-color: #fa5e02;
     color: #fff;
     float: right;
     right: -250px;
-`;
+`; */
 const StyledPicker = styled(Picker)`
     right: 20px;
     position: absolute;
@@ -955,13 +951,13 @@ const WelcomeBody = styled(Typography)`
 `;
 
 
-const ChatMessage = styled.div`
+/* const ChatMessage = styled.div`
   
   padding: 30px;
   max-height: 65vh;
   overflow-y: scroll;
 
-`;
+`; */
 
 const Replies = styled(Button)`
     background-color: #fff;
