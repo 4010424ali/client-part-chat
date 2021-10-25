@@ -349,6 +349,7 @@ function ChatRoomPage(props) {
                     sx={{
                         width: drawerWidth,
                         flexShrink: 0,
+                        display: 'block',
                         '& .MuiDrawer-paper': {
                             width: 100,
                             boxSizing: 'border-box'
@@ -888,9 +889,10 @@ const MessageHeader = styled.div`
 `;
 
 const Chair = styled(Toolbar)`
-    height: 200px;
+    height: 75%;
     background-color: #fafafa;
     display: block;
+    
 `;
 
 const ChairTitle = styled(Typography)`
