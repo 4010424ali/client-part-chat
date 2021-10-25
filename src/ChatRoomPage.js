@@ -889,7 +889,7 @@ const MessageHeader = styled.div`
 `;
 
 const Chair = styled(Toolbar)`
-    height: 300px;
+    height: 200px;
     background-color: #fafafa;
     display: block;
     
