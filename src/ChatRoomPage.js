@@ -683,7 +683,8 @@ function ChatRoomPage(props) {
                               className="styled-input"
                               noValidate
                               onSubmit={handleSubmit}
-                            >
+                              autocomplete="off"  
+                              >
                               <StyledInput
                                 InputProps={{ disableUnderline: true }}
                                 type="text"
@@ -723,6 +724,7 @@ function ChatRoomPage(props) {
                 className="styled-input"
                 noValidate
                 onSubmit={handleSubmit}
+                autocomplete="off"  
                 style={{ position: 'relative' }}
               >
                 <StyledInput
